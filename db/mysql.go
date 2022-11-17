@@ -16,7 +16,9 @@ var (
 	DB_NAME = config.GetEnvVariable("DB_NAME")
 )
 
-func ConnectDB() (*gorm.DB, error) {
+var DB *gorm.DB
+
+func ConnectDB() {
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME,
@@ -28,5 +30,5 @@ func ConnectDB() (*gorm.DB, error) {
 		panic(err)
 	}
 
-	return gormDB, nil
+	DB = gormDB
 }
