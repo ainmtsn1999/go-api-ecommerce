@@ -5,6 +5,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func WriteJsonResponse(ctx echo.Context, payload *views.Response) {
-	ctx.JSON(payload.Status, payload)
+func WriteJsonResponse(ctx echo.Context, payload *views.Response) error {
+	return ctx.JSON(payload.Status, payload)
 }

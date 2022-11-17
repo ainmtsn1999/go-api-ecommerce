@@ -4,7 +4,7 @@ type Response struct {
 	Status  int         `json:"status"`
 	Message string      `json:"message"`
 	Payload interface{} `json:"payload,omitempty"`
-	Error   string      `json:"error,omitempty"`
+	Error   interface{} `json:"error,omitempty"`
 }
 
 func SuccessResponse(msg string, payload interface{}, statusCode int) *Response {
@@ -15,7 +15,7 @@ func SuccessResponse(msg string, payload interface{}, statusCode int) *Response 
 	}
 }
 
-func ErrorResponse(msg string, err string, statusCode int) *Response {
+func ErrorResponse(msg string, err interface{}, statusCode int) *Response {
 	return &Response{
 		Status:  statusCode,
 		Message: msg,

@@ -12,7 +12,7 @@ import (
 )
 
 type Token struct {
-	UserId string `json:"user_id"`
+	AuthId int    `json:"auth_id"`
 	Email  string `json:"email"`
 }
 
