@@ -2,24 +2,19 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/ainmtsn1999/go-api-ecommerce/config"
-	"github.com/labstack/echo"
+	"github.com/ainmtsn1999/go-api-ecommerce/db"
+	"github.com/ainmtsn1999/go-api-ecommerce/routers"
 )
 
 func main() {
 
-	// db, err := db.ConnectDB()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	//koneksi database
+	db.ConnectDB()
 
-	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-
+	//router
+	e := routers.Init()
 	port := fmt.Sprintf(":%s", config.GetEnvVariable("APP_PORT"))
 	e.Logger.Fatal(e.Start(port))
 }
