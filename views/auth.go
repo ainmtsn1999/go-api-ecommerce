@@ -44,12 +44,8 @@ func Login(req *models.AuthLogin) *Response {
 	if err != nil {
 		return ErrorResponse("INVALID_CREDENTIAL", "UNAUTHORIZED", http.StatusUnauthorized)
 	}
-	tokenPayload := helper.Token{
-		AuthId: auth.Id,
-		Email:  auth.Email,
-	}
 
-	tokenString, err := helper.GenerateToken(&tokenPayload)
+	tokenString, err := helper.GenerateToken(auth.Id, auth.Email)
 	if err != nil {
 		return ErrorResponse("LOGIN_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
