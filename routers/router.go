@@ -4,17 +4,32 @@ import (
 	"net/http"
 
 	"github.com/ainmtsn1999/go-api-ecommerce/controllers"
+	"github.com/ainmtsn1999/go-api-ecommerce/middlewares"
 	"github.com/labstack/echo"
 )
 
 func Init() *echo.Echo {
+
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	e.POST("/auth/register", controllers.Register)
-	e.POST("/auth/login", controllers.Login)
+	auth := e.Group("/auth")
+	auth.POST("/register", controllers.Register)
+	auth.POST("/login", controllers.Login)
+
+	user := e.Group("/users", middlewares.IsLoggedIn)
+	user.GET("", controllers.GetAllUser, middlewares.IsAdmin)
+	user.POST("/profile", controllers.CreateUser, middlewares.IsUser)
+	user.PUT("/profile", controllers.UpdateUser, middlewares.IsUser)
+	user.GET("/profile", controllers.GetUser, middlewares.IsUser)
+
+	merchant := e.Group("/merchants", middlewares.IsLoggedIn)
+	merchant.GET("", controllers.GetAllMerchant, middlewares.IsAdmin)
+	merchant.POST("/profile", controllers.CreateMerchant, middlewares.IsMerchant)
+	merchant.PUT("/profile", controllers.UpdateMerchant, middlewares.IsMerchant)
+	merchant.GET("/profile", controllers.GetMerchant, middlewares.IsMerchant)
 
 	return e
 }
