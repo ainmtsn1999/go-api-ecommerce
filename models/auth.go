@@ -29,9 +29,20 @@ func Register(acc *Auth) error {
 
 	return err
 }
+
 func FindAccByEmail(email string) (*Auth, error) {
 	var auth Auth
 	err := db.DB.Where("email=?", email).First(&auth).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth, nil
+}
+
+func FindAccById(id int) (*Auth, error) {
+	var auth Auth
+	err := db.DB.Where("id=?", id).First(&auth).Error
 	if err != nil {
 		return nil, err
 	}
