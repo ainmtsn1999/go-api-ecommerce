@@ -11,6 +11,7 @@ import (
 func Validate(u interface{}) error {
 	validate := validator.New()
 	validate.RegisterValidation("isValidRole", isValidRole)
+	validate.RegisterValidation("isValidStatus", isValidStatus)
 	err := validate.Struct(u)
 
 	if err == nil {
@@ -31,6 +32,22 @@ func isValidRole(fl validator.FieldLevel) bool {
 	}
 
 	elems := []string{enums.Admin, enums.User, enums.Merchant}
+
+	for _, s := range elems {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}
+
+func isValidStatus(fl validator.FieldLevel) bool {
+	v, ok := fl.Field().Interface().(string)
+	if !ok {
+		return false
+	}
+
+	elems := []string{"WAITING", "PICKUP", "ON_THE_WAY", "ARRIVED"}
 
 	for _, s := range elems {
 		if v == s {

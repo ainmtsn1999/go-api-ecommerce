@@ -31,5 +31,18 @@ func Init() *echo.Echo {
 	merchant.PUT("/profile", controllers.UpdateMerchant, middlewares.IsMerchant)
 	merchant.GET("/profile", controllers.GetMerchant, middlewares.IsMerchant)
 
+	product := e.Group("/products")
+	product.GET("", controllers.GetAllProduct)
+	product.GET("/merchant/:id", controllers.GetAllMerchantProduct)
+	product.GET("/id/:id", controllers.GetProduct)
+	product.POST("", controllers.CreateProduct, middlewares.IsLoggedIn, middlewares.IsMerchant)
+	product.PUT("/id/:id", controllers.UpdateProduct, middlewares.IsLoggedIn, middlewares.IsMerchant)
+	product.DELETE("/id/:id", controllers.DeleteProduct, middlewares.IsLoggedIn, middlewares.IsMerchant)
+
+	order := e.Group("/orders", middlewares.IsLoggedIn)
+	order.POST("/inquire", controllers.InquireOrder, middlewares.IsUser)
+	order.POST("/confirm", controllers.ConfirmOrder, middlewares.IsUser)
+	order.PUT("/id/:id/status", controllers.UpdateStatOrder, middlewares.IsMerchant)
+
 	return e
 }

@@ -61,7 +61,7 @@ func UpdateMerchant(merchant *Merchant, authId int) error {
 	return db.DB.Model(merchant).Where("auth_id = ?", authId).Updates(merchant).Error
 }
 
-func GetMerchantDetail(id int) (*Merchant, error) {
+func GetMerchantById(id int) (*Merchant, error) {
 	var merchant Merchant
 	err := db.DB.First(&merchant, "auth_id = ?", id).Error
 	if err != nil {

@@ -62,7 +62,7 @@ func GetAllUserResponse(users *[]models.User) (*[]UserDetail, error) {
 }
 
 func GetUserDetail(id int, email string) *Response {
-	user, err := models.GetUserDetail(id)
+	user, err := models.GetUserById(id)
 	if err == gorm.ErrRecordNotFound {
 		return ErrorResponse("GET_USER_PROFILE_FAILED", "NOT_FOUND", http.StatusNotFound)
 	}
@@ -111,10 +111,10 @@ func UpdateUser(req *models.UserRequest, authId int) *Response {
 	err := models.UpdateUser(user, authId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			ErrorResponse("UPDATE_USER_FAILED", "NOT_FOUND", http.StatusNotFound)
+			ErrorResponse("UPDATE_USER_FAILED", "NOT_FOUND", http.StatusNotModified)
 		}
 		return ErrorResponse("UPDATE_USER_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
-	return SuccessResponse("UPDATE_USER_SUCCESS", nil, http.StatusCreated)
+	return SuccessResponse("UPDATE_USER_SUCCESS", nil, http.StatusAccepted)
 }

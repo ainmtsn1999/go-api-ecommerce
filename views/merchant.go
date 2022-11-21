@@ -61,9 +61,12 @@ func GetAllMerchantResponse(merchants *[]models.Merchant) (*[]MerchantDetail, er
 }
 
 func GetMerchantDetail(id int, email string) *Response {
-	merchant, err := models.GetMerchantDetail(id)
-	if err == gorm.ErrRecordNotFound {
-		return ErrorResponse("GET_MERCHANT_PROFILE_FAILED", "NOT_FOUND", http.StatusNotFound)
+	merchant, err := models.GetMerchantById(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ErrorResponse("GET_MERCHANT_PROFILE_FAILED", "NOT_FOUND", http.StatusNotFound)
+		}
+		return ErrorResponse("GET_MERCHANT_PROFILE_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
 	resp, err := MerchantDetailResponse(merchant, email)
