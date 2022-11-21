@@ -45,7 +45,7 @@ func UpdateUser(user *User, authId int) error {
 	return db.DB.Model(user).Where("auth_id = ?", authId).Updates(user).Error
 }
 
-func GetUserDetail(id int) (*User, error) {
+func GetUserById(id int) (*User, error) {
 	var user User
 	err := db.DB.First(&user, "auth_id = ?", id).Error
 	if err != nil {
