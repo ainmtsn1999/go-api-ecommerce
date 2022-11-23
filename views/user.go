@@ -63,8 +63,11 @@ func GetAllUserResponse(users *[]models.User) (*[]UserDetail, error) {
 
 func GetUserDetail(id int, email string) *Response {
 	user, err := models.GetUserById(id)
-	if err == gorm.ErrRecordNotFound {
-		return ErrorResponse("GET_USER_PROFILE_FAILED", "NOT_FOUND", http.StatusNotFound)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ErrorResponse("GET_USER_PROFILE_FAILED", "NOT_FOUND", http.StatusNotFound)
+		}
+		return ErrorResponse("GET_USER_PROFILE_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
 	resp, err := UserDetailResponse(user, email)
@@ -77,13 +80,23 @@ func GetUserDetail(id int, email string) *Response {
 
 func UserDetailResponse(user *models.User, email string) (*UserDetail, error) {
 
+	var address interface{}
+
+	activeAddress, err := models.GetActivateUserAddressByUserId(user.AuthId)
+
+	if err == nil {
+		address = echo.Map{"street": activeAddress.Street, "city_id": activeAddress.CityId, "province_id": activeAddress.ProvinceId, "address_tag": activeAddress.AddressTag}
+	} else {
+		address = echo.Map{"message": "ADDRESS_NOT_FOUND"}
+	}
+
 	return &UserDetail{
 		Id:          user.AuthId,
 		Name:        user.Name,
 		Gender:      user.Gender,
 		PhoneNumber: user.PhoneNumber,
 		PictUrl:     user.PictUrl,
-		Address:     echo.Map{"message": "NOT_PROCESSING_YET"},
+		Address:     address,
 		Auth:        echo.Map{"email": email},
 	}, nil
 }
