@@ -24,6 +24,12 @@ func Init() *echo.Echo {
 	user.POST("/profile", controllers.CreateUser, middlewares.IsUser)
 	user.PUT("/profile", controllers.UpdateUser, middlewares.IsUser)
 	user.GET("/profile", controllers.GetUser, middlewares.IsUser)
+	user.POST("/profile/address", controllers.CreateAddress, middlewares.IsUser)
+	user.PUT("/address/id/:id", controllers.UpdateAddress, middlewares.IsUser)
+	user.DELETE("/address/id/:id", controllers.DeleteAddress, middlewares.IsUser)
+	user.GET("/address/id/:id", controllers.GetAddress, middlewares.IsUser)
+	user.GET("/profile/address", controllers.GetAllUserAddresses, middlewares.IsUser)
+	user.PUT("/address/id/:id/activate", controllers.UpdateActivateAddress, middlewares.IsUser)
 
 	merchant := e.Group("/merchants", middlewares.IsLoggedIn)
 	merchant.GET("", controllers.GetAllMerchant, middlewares.IsAdmin)
@@ -42,7 +48,10 @@ func Init() *echo.Echo {
 	order := e.Group("/orders", middlewares.IsLoggedIn)
 	order.POST("/inquire", controllers.InquireOrder, middlewares.IsUser)
 	order.POST("/confirm", controllers.ConfirmOrder, middlewares.IsUser)
-	order.PUT("/id/:id/status", controllers.UpdateStatOrder, middlewares.IsMerchant)
+	order.PUT("/id/:id/status", controllers.UpdateStatOrder, middlewares.IsUser)
+	order.GET("/id/:id", controllers.GetOrder, middlewares.IsUser)
+	order.GET("/histories/me", controllers.GetAllUserOrder, middlewares.IsUser)
+	order.PUT("/id/:orderId/product/:productId/status", controllers.UpdateStatOrderItem, middlewares.IsMerchant)
 
 	return e
 }

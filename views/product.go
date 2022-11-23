@@ -52,6 +52,7 @@ func GetAllMerchantProduct(id int, limit int, page int) *Response {
 		}
 		return ErrorResponse("GET_ALL_MERCHANT_PRODUCTS_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
+
 	pagination := models.Pagination{
 		Limit: limit,
 		Page:  page,
@@ -80,8 +81,11 @@ func GetAllProductResponse(products *[]models.Product) (*[]ProductDetail, error)
 
 func GetProductDetail(id int) *Response {
 	product, err := models.GetProductById(id)
-	if err == gorm.ErrRecordNotFound {
-		return ErrorResponse("GET_PRODUCT_FAILED", "NOT_FOUND", http.StatusNotFound)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ErrorResponse("GET_PRODUCT_FAILED", "NOT_FOUND", http.StatusNotFound)
+		}
+		return ErrorResponse("GET_PRODUCT_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
 	resp, err := ProductDetailResponse(product)
@@ -156,15 +160,3 @@ func DeleteProduct(productId int) *Response {
 
 	return SuccessResponse("DELETE_PRODUCT_SUCCESS", nil, http.StatusOK)
 }
-
-//func CheckRole(){
-//check role
-// resp, err1 := models.GetProductById(productId)
-// if err1 != nil {
-// 	return ErrorResponse("UPDATE_PRODUCT_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
-// }
-
-// if resp.MerchantId != authId {
-// 	return ErrorResponse("UPDATE_PRODUCT_FAILED", "UNAUTHORIZED", http.StatusUnauthorized)
-// }
-//}
