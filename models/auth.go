@@ -1,11 +1,21 @@
 package models
 
 import (
+	"time"
+
 	"github.com/ainmtsn1999/go-api-ecommerce/db"
 	"gorm.io/gorm"
 )
 
 type Auth struct {
+	Id       int       `json:"id"`
+	Email    string    `json:"email"`
+	Password string    `json:"password"`
+	Role     string    `json:"role"`
+	LoginAt  time.Time `json:"login_at"`
+}
+
+type AuthRequest struct {
 	Id       int    `json:"id"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=8"`
@@ -15,6 +25,15 @@ type Auth struct {
 type AuthLogin struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=8"`
+}
+
+func (r *AuthRequest) ParseToModel() *Auth {
+	return &Auth{
+		Id:       r.Id,
+		Email:    r.Email,
+		Password: r.Password,
+		Role:     r.Role,
+	}
 }
 
 // func model
@@ -48,4 +67,8 @@ func FindAccById(id int) (*Auth, error) {
 	}
 
 	return &auth, nil
+}
+
+func UpdateAuth(authId int, auth *Auth) error {
+	return db.DB.Model(auth).Where("id = ?", authId).Updates(auth).Error
 }

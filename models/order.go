@@ -115,3 +115,15 @@ func GetAllOrderByUserId(id int, limit int, page int) (*[]Order, error) {
 
 	return &orders, nil
 }
+
+func GetAllOrder(limit int, page int) (*[]Order, error) {
+	var orders []Order
+
+	offset := (page - 1) * limit
+	err := db.DB.Limit(limit).Offset(offset).Find(&orders).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &orders, nil
+}
