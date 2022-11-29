@@ -10,7 +10,7 @@ import (
 )
 
 func Register(ctx echo.Context) error {
-	var req models.Auth
+	var req models.AuthRequest
 	err := ctx.Bind(&req)
 	if err != nil {
 		resp := views.ErrorResponse("INVALID_REQUEST", "BAD_REQUEST", http.StatusBadRequest)

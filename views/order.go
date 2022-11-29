@@ -51,8 +51,8 @@ type OrderDetail struct {
 	DeletedAt   time.Time         `json:"deleted_at"`
 }
 
-func GetAllUserOrder(id int, limit int, page int) *Response {
-	orders, err := models.GetAllOrderByUserId(id, limit, page)
+func GetAllOrder(limit int, page int) *Response {
+	orders, err := models.GetAllOrder(limit, page)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return ErrorResponse("GET_ALL_ORDERS_DETAIL_FAILED", "NOT_FOUND", http.StatusNotFound)
@@ -71,6 +71,29 @@ func GetAllUserOrder(id int, limit int, page int) *Response {
 	}
 
 	return SuccessResponseWithQuery("GET_ALL_ORDERS_DETAIL_SUCCESS", resp, pagination, http.StatusOK)
+
+}
+
+func GetAllUserOrder(id int, limit int, page int) *Response {
+	orders, err := models.GetAllOrderByUserId(id, limit, page)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ErrorResponse("GET_ALL_USER_ORDERS_DETAIL_FAILED", "NOT_FOUND", http.StatusNotFound)
+		}
+		return ErrorResponse("GET_ALL_USER_ORDERS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+	}
+	pagination := models.Pagination{
+		Limit: limit,
+		Page:  page,
+		Total: len(*orders),
+	}
+
+	resp, err := GetAllOrderResponse(orders)
+	if err != nil {
+		return ErrorResponse("GET_ALL_USER_ORDERS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+	}
+
+	return SuccessResponseWithQuery("GET_ALL_USER_ORDERS_DETAIL_SUCCESS", resp, pagination, http.StatusOK)
 
 }
 
@@ -183,7 +206,10 @@ func InquireOrderDetailResponse(req *models.OrderRequest, userId int) (*InquireO
 	var totPrice = 0
 
 	user, err := models.GetUserById(userId)
-	if err == gorm.ErrRecordNotFound {
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, err
+		}
 		return nil, err
 	}
 

@@ -136,8 +136,8 @@ func GetOrder(ctx echo.Context) error {
 }
 
 func GetAllUserOrder(ctx echo.Context) error {
-	merchant := ctx.Get("user").(*jwt.Token)
-	claims := merchant.Claims.(jwt.MapClaims)
+	user := ctx.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
 	userId := claims["auth_id"].(float64)
 
 	limitStr := ctx.QueryParam("limit")
@@ -159,5 +159,28 @@ func GetAllUserOrder(ctx echo.Context) error {
 	}
 
 	resp := views.GetAllUserOrder(int(userId), limit, page)
+	return WriteJsonResponse(ctx, resp)
+}
+
+func GetAllOrder(ctx echo.Context) error {
+	limitStr := ctx.QueryParam("limit")
+	pageStr := ctx.QueryParam("page")
+
+	var limit int
+	var page int
+
+	if limitStr == "" {
+		limit = 25
+	} else {
+		limit, _ = strconv.Atoi(limitStr)
+	}
+
+	if pageStr == "" {
+		page = 1
+	} else {
+		page, _ = strconv.Atoi(pageStr)
+	}
+
+	resp := views.GetAllOrder(limit, page)
 	return WriteJsonResponse(ctx, resp)
 }
