@@ -55,8 +55,8 @@ func Init() *echo.Echo {
 	order.PUT("/id/:orderId/product/:productId/status", controllers.UpdateStatOrderItem, middlewares.IsMerchant)
 
 	review := e.Group("/reviews")
-	review.GET("", controllers.GetAllReview)
-	review.GET("/id/:id", controllers.GetReview)
+	review.GET("", controllers.GetAllReview, middlewares.IsLoggedIn, middlewares.IsAdmin)
+	review.GET("/id/:id", controllers.GetReview, middlewares.IsLoggedIn, middlewares.IsUser)
 	review.GET("/product/:id", controllers.GetAllProductReview)
 	review.GET("/order/:id", controllers.GetAllOrderReview, middlewares.IsLoggedIn, middlewares.IsUser)
 	review.GET("/user/:id", controllers.GetAllOrderReview, middlewares.IsLoggedIn, middlewares.IsUser)

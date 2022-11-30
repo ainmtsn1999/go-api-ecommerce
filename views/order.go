@@ -55,9 +55,9 @@ func GetAllOrder(limit int, page int) *Response {
 	orders, err := models.GetAllOrder(limit, page)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return ErrorResponse("GET_ALL_ORDERS_DETAIL_FAILED", "NOT_FOUND", http.StatusNotFound)
+			return ErrorResponse("GET_ALL_ORDER_HISTORIES_FAILED", "NOT_FOUND", http.StatusNotFound)
 		}
-		return ErrorResponse("GET_ALL_ORDERS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_ALL_ORDER_HISTORIES_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 	pagination := models.Pagination{
 		Limit: limit,
@@ -67,10 +67,10 @@ func GetAllOrder(limit int, page int) *Response {
 
 	resp, err := GetAllOrderResponse(orders)
 	if err != nil {
-		return ErrorResponse("GET_ALL_ORDERS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_ALL_ORDER_HISTORIES_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
-	return SuccessResponseWithQuery("GET_ALL_ORDERS_DETAIL_SUCCESS", resp, pagination, http.StatusOK)
+	return SuccessResponseWithQuery("GET_ALL_ORDER_HISTORIES_SUCCESS", resp, pagination, http.StatusOK)
 
 }
 
@@ -78,9 +78,9 @@ func GetAllUserOrder(id int, limit int, page int) *Response {
 	orders, err := models.GetAllOrderByUserId(id, limit, page)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return ErrorResponse("GET_ALL_USER_ORDERS_DETAIL_FAILED", "NOT_FOUND", http.StatusNotFound)
+			return ErrorResponse("GET_ALL_USER_ORDER_HISTORIES_FAILED", "NOT_FOUND", http.StatusNotFound)
 		}
-		return ErrorResponse("GET_ALL_USER_ORDERS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_ALL_USER_ORDER_HISTORIES_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 	pagination := models.Pagination{
 		Limit: limit,
@@ -90,10 +90,10 @@ func GetAllUserOrder(id int, limit int, page int) *Response {
 
 	resp, err := GetAllOrderResponse(orders)
 	if err != nil {
-		return ErrorResponse("GET_ALL_USER_ORDERS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_ALL_USER_ORDER_HISTORIES_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
-	return SuccessResponseWithQuery("GET_ALL_USER_ORDERS_DETAIL_SUCCESS", resp, pagination, http.StatusOK)
+	return SuccessResponseWithQuery("GET_ALL_USER_ORDER_HISTORIES_SUCCESS", resp, pagination, http.StatusOK)
 
 }
 
@@ -111,15 +111,15 @@ func GetAllOrderResponse(orders *[]models.Order) (*[]OrderDetail, error) {
 func GetOrderDetail(id int) *Response {
 	order, err := models.GetOrderById(id)
 	if err == gorm.ErrRecordNotFound {
-		return ErrorResponse("GET_ORDER_DETAIL_FAILED", "NOT_FOUND", http.StatusNotFound)
+		return ErrorResponse("GET_ORDER_FAILED", "NOT_FOUND", http.StatusNotFound)
 	}
 
 	resp, err := OrderDetailResponse(order)
 	if err != nil {
-		return ErrorResponse("GET_ORDER_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_ORDER_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
-	return SuccessResponse("GET_ORDER_DETAIL_SUCCESS", resp, http.StatusOK)
+	return SuccessResponse("GET_ORDER_SUCCESS", resp, http.StatusOK)
 }
 
 func OrderDetailResponse(order *models.Order) (*OrderDetail, error) {
