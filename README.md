@@ -1,7 +1,32 @@
 # go-api-ecommerce
 Ini merupakan dokumentasi final project untuk divisi backend Intern AI di JATIS MOBILE. 
 by: [Muhammad Inayatulloh](https:#www.linkedin.com/in/muhammad-inayatulloh/) 
-
+## Brief
+Adapun, toko online sederhana ini bisa melakukan hal hal berikut :
+- Admin
+  - Registrasi
+  - Login
+  - Melihat semua data user, dan merchant
+  - Melihat semua orderan
+  - Melihat semua review
+- Merchant
+  - Registrasi
+  - Login
+  - Manage data profile merhant (Create, Read, Update, Delete)
+  - Manage seluruh produk (Create, Read, Update, Delete)
+  - Update status item orderan (Approve -> Sending)
+- User
+  - Registrasi
+  - Login
+  - Manage data profile user (Create, Read, Update, Delete)
+  - Melihat produk
+  - Melihat detail produk
+  - Melihat review produk
+  - Membeli produk
+  - Melihat riwayat orderan
+  - Update status orderan (On Process -> Confirmed)
+  - Membuat review produk dari orderan yang sudah selesai
+  
 ## Skema Database
 Skema database yang digunakan dalam project ini bisa dilihat detailnya di: [dbdiagram](https://dbdiagram.io/d/634d696347094101957b7381)
 
@@ -337,6 +362,7 @@ Berfungsi untuk menghapus data alamat user. Endpoint ini hanya berlaku untuk `us
 Authorization : Bearer <token>
 ```
 
+**Response Body**
 ```json
 {
     "status" : 200,
@@ -751,7 +777,7 @@ Jika gagal, maka akan menghasilkan response :
 ```
 
 #### `GET` /products
-Akan menampilkan seluruh data products. Endpoint ini bisa diakses seluruh pengguna tanpa login.
+Akan menampilkan seluruh data product. Endpoint ini bisa diakses seluruh pengguna tanpa login.
 
 **Request Headers**
 ```bash
@@ -801,7 +827,7 @@ Jika gagal, maka akan menghasilkan response :
 ```
 
 #### `GET` /products/merchant/:id
-Akan menampilkan seluruh data products. Endpoint ini bisa diakses seluruh pengguna tanpa login.
+Akan menampilkan seluruh data product merchant yang dipilih. Endpoint ini bisa diakses seluruh pengguna tanpa login.
 
 **Params**
 - id : `int` | required
@@ -896,17 +922,666 @@ Jika gagal, maka akan menghasilkan response :
 
 ###	Order
 #### `POST` /orders/inquire
+Ini berfungsi untuk inquiry transaksi. Pada proses ini, akan dilakukan pengecekan pesanan. Proses ini hanya bisa dilakukan oleh `user`.
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "items":[{
+        "product_id" : 1, #int
+        "quantity" : 5, #int
+        "notes": "string"
+        },
+        {
+        "product_id" : 6, #int
+        "quantity" : 2, #int
+        "notes": "string"
+        }
+    ]
+}
+```
+**Notes** : Pada proses ini, akan melakukan pengecekan ke stok product, apakah stok masih tersedia atau tidak.
+
+**Response Body**
+```json
+{
+    "status": 201,
+    "message": "INQUIRY_ORDER_SUCCESS",
+    "payload": {
+        "user": {
+            "id": 1,
+            "name": "string",
+            "phone_number": "08xxxxxxxxxx",
+            "email": "test@test.com"
+        },
+        "order": [
+            {
+                "item": {
+                    "id": 1,
+                    "merchant": {
+                        "id": 2,
+                        "name": "string"
+                    },
+                    "name": "string",
+                    "weight": 1000,
+                    "price": 10000000,
+                    "img_url": "string"
+                },
+                "quantity": 5,
+                "notes": "string"
+            },
+            {
+                "item": {
+                    "id": 6,
+                    "merchant": {
+                        "id": 2,
+                        "name": "string"
+                    },
+                    "name": "string",
+                    "weight": 1000,
+                    "price": 10000000,
+                    "img_url": "string"
+                },
+                "quantity": 2,
+                "notes": "string"
+            }
+        ],
+        "total_weight": 7000,
+        "total_price": 70000000
+    }
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 422, # Unprocessable entity, or others...
+    "message" : "INQUIRY_ORDER_FAILED",
+    "error" : "UNPROCESSABLE_ENTITY"
+}
+```
+
 #### `POST` /orders/confirm
-#### `PUT` /orders/id/:id/status
-#### `GET` /orders/id/:id
+Ini berfungsi untuk konfirmasi order. Pada proses ini, akan dilakukan proses update stok pada produk dan insert ke table order. Proses ini hanya bisa dilakukan oleh `user`.
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "items":[{
+        "product_id" : 1, #int
+        "quantity" : 5, #int
+        "notes": "string"
+        },
+        {
+        "product_id" : 6, #int
+        "quantity" : 2, #int
+        "notes": "string"
+        }
+    ]
+}
+```
+**Notes** : Pada proses ini, akan melakukan pengecekan ke stok product, apakah stok masih tersedia atau tidak. Secara default, status yang di set adalah `ON_PROCESS`
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "CONFIRM_ORDER_SUCCESS"
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Bad request, or others...
+    "message" : "CONFIRM_ORDER_FAILED",
+    "error" : "FORBIDDEN_ACCESS"
+}
+```
+
 #### `GET` /orders/histories/me
+Ini berfungsi untuk melihat riwayat order user yang sedang login.
+
+**Query String**
+- limit : `int` with default is 25  | optional
+- page  : `int` with default is 1   | optional
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_ALL_USER_ORDER_HISTORIES_SUCCESS",
+    "payload": [
+        {
+            "id": 1,
+            "user": {
+                "id": 1,
+                "name": "string",
+                "phone_number": "08xxxxxxxxxxx",
+                "email": "test@test.com"
+            },
+            "order": [
+                {
+                    "item": {
+                        "id": 1,
+                        "merchant": {
+                            "id": 2,
+                            "name": "string"
+                        },
+                        "name": "string",
+                        "weight": 1000,
+                        "price": 10000000,
+                        "img_url": "string"
+                    },
+                    "quantity": 5,
+                    "notes": ""
+                },
+                {
+                    "item": {
+                        "id": 6,
+                        "merchant": {
+                            "id": 2,
+                            "name": "string"
+                        },
+                        "name": "string",
+                        "weight": 1000,
+                        "price": 10000000,
+                        "img_url": "string"
+                    },
+                    "quantity": 2,
+                    "notes": ""
+                }
+            ],
+            "total_weight": 7000,
+            "total_price": 70000000,
+            "status": "string", #ON_PROCESS, CONFIRMED
+            "created_at": "datetime",
+            "updated_at": "timestamp",
+            "deleted_at": "datetime"
+        }
+    ],
+    "query": {
+        "limit": 25,
+        "page": 1,
+        "total": 1
+    }
+}
+```
+
 #### `GET` /orders/histories/list
+Ini berfungsi untuk melihat riwayat transaction seluruh user. Endpoint ini hanya bisa di akses oleh `admin`.
+
+**Query String**
+- limit : `int` with default is 25  | optional
+- page  : `int` with default is 1   | optional
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_ALL_ORDER_HISTORIES_SUCCESS",
+    "payload": [
+        {
+            "id": 1,
+            "user": {
+                "id": 1,
+                "name": "string",
+                "phone_number": "08xxxxxxxxxxx",
+                "email": "test@test.com"
+            },
+            "order": [
+                {
+                    "item": {
+                        "id": 1,
+                        "merchant": {
+                            "id": 2,
+                            "name": "string"
+                        },
+                        "name": "string",
+                        "weight": 1000,
+                        "price": 10000000,
+                        "img_url": "string"
+                    },
+                    "quantity": 5,
+                    "notes": ""
+                },
+                {
+                    "item": {
+                        "id": 6,
+                        "merchant": {
+                            "id": 2,
+                            "name": "string"
+                        },
+                        "name": "string",
+                        "weight": 1000,
+                        "price": 10000000,
+                        "img_url": "string"
+                    },
+                    "quantity": 2,
+                    "notes": ""
+                }
+            ],
+            "total_weight": 7000,
+            "total_price": 70000000,
+            "status": "string",  #ON_PROCESS, CONFIRMED
+            "created_at": "datetime",
+            "updated_at": "timestamp",
+            "deleted_at": "datetime"
+        }
+    ],
+    "query": {
+        "limit": 25,
+        "page": 1,
+        "total": 1
+    }
+}
+```
+
+#### `GET` /orders/id/:id
+Akan menampilkan detail order yang dipilih. Endpoint ini hanya bisa diakses oleh `user`.
+
+**Params**
+- id : `int` | required
+  
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_ORDER_SUCCESS",
+    "payload": {
+        "id": 1,
+        "user": {
+            "id": 1,
+            "name": "string",
+            "phone_number": "08xxxxxxxxx",
+            "email": "test@test.com"
+        },
+        "order": [
+            {
+                "item": {
+                    "id": 1,
+                    "merchant": {
+                        "id": 2,
+                        "name": "string"
+                    },
+                    "name": "string",
+                    "weight": 1000,
+                    "price": 10000000,
+                    "img_url": "string"
+                },
+                "quantity": 5,
+                "notes": ""
+            }
+        ],
+        "total_weight": 5000,
+        "total_price": 50000000,
+        "status": "string",  #ON_PROCESS, CONFIRMED
+        "created_at": "datetime",
+        "updated_at": "timestamp",
+        "deleted_at": "datetime"
+    }
+}
+```
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 401, # Unauthorized, Not Found, or others...
+    "message" : "GET_ORDER_FAILED",
+    "error" : "UNAUTHORIZED"
+}
+```
+
+#### `PUT` /orders/id/:id/status
+Ini berfungsi untuk mengubah status order user. Endpoint ini hanya bisa di akses oleh `user`
+
+**Params**
+- id : `int` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "status" : "string"
+}
+```
+List status : 
+- ON_PROCESS 
+- CONFIRMED
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "UPDATE_STATUS_ORDER_SUCCESS"
+}
+```
+
 #### `PUT` /orders/id/:orderId/product/:productId/status
+Ini berfungsi untuk mengubah status item order. Endpoint ini hanya bisa di akses oleh `merchant`
+
+
+**Params**
+- orderId : `int` | required
+- productId : `int` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "status" : "string"
+}
+```
+List status : 
+- WAITING 
+- PICKUP
+- ON THE WAY
+- ARRIVED
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "UPDATE_STATUS_ORDER_ITEM_SUCCESS"
+}
+```
 
 ###	Review
 #### `POST` /reviews
+Berfungsi untuk create review product by order. Endpoint ini hanya berlaku untuk `user`.
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "order_id": 1,
+    "product_id" : 1,
+    "rating" : 5,
+    "notes" : "string",
+    "img_url" : "tring"
+}
+```
+
+**Response Body**
+```json
+{
+    "status" : 201,
+    "message" : "CREATE_REVIEW_SUCCESS"
+}
+```
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 400, # Bad request, or others...
+    "message" : "CREATE_REVIEW_FAILED",
+    "error" : "BAD_REQUEST"
+}
+```
+
 #### `GET` /reviews
+Akan menampilkan seluruh data reviews. Endpoint ini hanya bisa diakses oleh `admin`.
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Query String**
+- limit : `int` with default is 25  | optional
+- page  : `int` with default is 1   | optional
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_ALL_REVIEWS_SUCCESS",
+    "payload": [
+        {
+            "id": 1,
+            "order_id": 1,
+            "user": {
+                "id": 1,
+                "name": "string"
+            },
+            "product": {
+                "id": 1,
+                "name": "string"
+            },
+            "rating": 5,
+            "notes": "string",
+            "img_url": "string"
+        }
+    ],
+    "query": {
+        "limit": 25,
+        "page": 1,
+        "total": 1
+    }
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Forbidden, Not Found, or others...
+    "message" : "GET_ALL_REVIEWS_FAILED",
+    "error" : "FORBIDDEN_ACCESS"
+}
+```
+
 #### `GET` /reviews/id/:id
+Akan menampilkan detail review yang dipilih. Endpoint ini hanya bisa diakses oleh `user`.
+
+**Params**
+- id : `int` | required
+  
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_REVIEW_SUCCESS",
+    "payload": {
+        "id": 1,
+        "order_id": 1,
+        "user": {
+            "id": 1,
+            "name": "string"
+        },
+        "product": {
+            "id": 1,
+            "name": "string"
+        },
+        "rating": 5,
+        "notes": "string",
+        "img_url": "string"
+    }
+}
+```
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 401, # Unauthorized, Not Found, or others...
+    "message" : "GET_REVIEW_FAILED",
+    "error" : "UNAUTHORIZED"
+}
+```
+
 #### `GET` /reviews/product/:id
+Akan menampilkan seluruh data review dari product yang dipilih. Endpoint ini bisa diakses semua pengguna tanpa login.
+
+**Params**
+- id : `int` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_ALL_PRODUCT_REVIEWS_SUCCESS",
+    "payload": [
+        {
+            "id": 1,
+            "order_id": 1,
+            "user": {
+                "id": 1,
+                "name": "string"
+            },
+            "product": {
+                "id": 1,
+                "name": "string"
+            },
+            "rating": 5,
+            "notes": "string",
+            "img_url": "string"
+        }
+    ],
+    "query": {
+        "limit": 25,
+        "page": 1,
+        "total": 1
+    }
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Forbidden, Not Found, or others...
+    "message" : "GET_ALL_PRODUCT_REVIEWS_FAILED",
+    "error" : "FORBIDDEN_ACCESS"
+}
+```
+
 #### `GET` /reviews/order/:id
+Akan menampilkan seluruh data review dari order yang dipilih. Endpoint ini hanya bisa diakses oleh `user`.
+
+**Params**
+- id : `int` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_ALL_ORDER_REVIEWS_SUCCESS",
+    "payload": [
+        {
+            "id": 1,
+            "order_id": 1,
+            "user": {
+                "id": 1,
+                "name": "string"
+            },
+            "product": {
+                "id": 1,
+                "name": "string"
+            },
+            "rating": 5,
+            "notes": "string",
+            "img_url": "string"
+        }
+    ]
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Forbidden, Not Found, or others...
+    "message" : "GET_ALL_ORDER_REVIEWS_FAILED",
+    "error" : "FORBIDDEN_ACCESS"
+}
+```
 #### `GET` /reviews/user/:id
+Akan menampilkan seluruh data review dari user yang dipilih. Endpoint ini hanya bisa diakses oleh `user`.
+
+**Params**
+- id : `int` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status": 200,
+    "message": "GET_ALL_USER_REVIEWS_SUCCESS",
+    "payload": [
+        {
+            "id": 1,
+            "order_id": 1,
+            "user": {
+                "id": 1,
+                "name": "string"
+            },
+            "product": {
+                "id": 1,
+                "name": "string"
+            },
+            "rating": 5,
+            "notes": "string",
+            "img_url": "string"
+        }
+    ]
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Forbidden, Not Found, or others...
+    "message" : "GET_ALL_USER_REVIEWS_FAILED",
+    "error" : "FORBIDDEN_ACCESS"
+}
+```
