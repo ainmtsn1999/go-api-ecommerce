@@ -59,17 +59,17 @@ func GetAddressDetail(id int) *Response {
 	address, err := models.GetAddressById(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return ErrorResponse("GET_ADDRESS_DETAIL_FAILED", "NOT_FOUND", http.StatusNotFound)
+			return ErrorResponse("GET_USER_ADDRESS_FAILED", "NOT_FOUND", http.StatusNotFound)
 		}
-		return ErrorResponse("GET_ADDRESS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_USER_ADDRESS_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
 	resp, err := AddressDetailResponse(address)
 	if err != nil {
-		return ErrorResponse("GET_ADDRESS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_USER_ADDRESS_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
-	return SuccessResponse("GET_ADDRESS_DETAIL_SUCCESS", resp, http.StatusOK)
+	return SuccessResponse("GET_USER_ADDRESS_SUCCESS", resp, http.StatusOK)
 }
 
 func AddressDetailResponse(address *models.Address) (*AddressDetail, error) {
@@ -161,9 +161,9 @@ func UpdateActivateAddress(req *models.UpdateActivateAddressRequest, addressId i
 	address, err := models.GetAddressById(addressId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return ErrorResponse("GET_ADDRESS_DETAIL_FAILED", "NOT_FOUND", http.StatusNotFound)
+			return ErrorResponse("GET_USER_ADDRESS_FAILED", "NOT_FOUND", http.StatusNotFound)
 		}
-		return ErrorResponse("GET_ADDRESS_DETAIL_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+		return ErrorResponse("GET_USER_ADDRESS_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 	}
 
 	activate, err := models.GetActivateUserAddressByUserId(address.UserId)
