@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/ainmtsn1999/go-api-ecommerce/db"
 	"gorm.io/gorm"
 )
@@ -59,6 +61,14 @@ func CreateMerchant(merchant *Merchant) error {
 
 func UpdateMerchant(merchant *Merchant, authId int) error {
 	return db.DB.Model(merchant).Where("auth_id = ?", authId).Updates(merchant).Error
+}
+
+func DeleteMerchant(merchantId int) error {
+
+	if db.DB.Where("auth_id = ?", merchantId).Delete(Merchant{}).RowsAffected == 0 {
+		return errors.New("NOT_AFFECTED")
+	}
+	return nil
 }
 
 func GetMerchantById(id int) (*Merchant, error) {

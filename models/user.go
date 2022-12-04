@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/ainmtsn1999/go-api-ecommerce/db"
 	"gorm.io/gorm"
 )
@@ -43,6 +45,14 @@ func CreateUser(user *User) error {
 
 func UpdateUser(user *User, authId int) error {
 	return db.DB.Model(user).Where("auth_id = ?", authId).Updates(user).Error
+}
+
+func DeleteUser(userId int) error {
+
+	if db.DB.Where("auth_id = ?", userId).Delete(User{}).RowsAffected == 0 {
+		return errors.New("NOT_AFFECTED")
+	}
+	return nil
 }
 
 func GetUserById(id int) (*User, error) {
