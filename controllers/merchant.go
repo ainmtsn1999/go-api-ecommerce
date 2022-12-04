@@ -95,15 +95,11 @@ func GetAllMerchant(ctx echo.Context) error {
 }
 
 func DeleteMerchant(ctx echo.Context) error {
-	paramId := ctx.Param("id")
+	user := ctx.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	authId := claims["auth_id"].(float64)
 
-	merchantId, err := strconv.Atoi(paramId)
-	if err != nil {
-		resp := views.ErrorResponse("INVALID_REQUEST", "BAD_REQUEST", http.StatusBadRequest)
-		return WriteJsonResponse(ctx, resp)
-	}
-
-	resp := views.DeleteMerchant(merchantId)
+	resp := views.DeleteMerchant(int(authId))
 	return WriteJsonResponse(ctx, resp)
 
 }

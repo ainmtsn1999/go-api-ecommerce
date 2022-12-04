@@ -95,15 +95,11 @@ func GetAllUser(ctx echo.Context) error {
 }
 
 func DeleteUser(ctx echo.Context) error {
-	paramId := ctx.Param("id")
+	user := ctx.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	authId := claims["auth_id"].(float64)
 
-	userId, err := strconv.Atoi(paramId)
-	if err != nil {
-		resp := views.ErrorResponse("INVALID_REQUEST", "BAD_REQUEST", http.StatusBadRequest)
-		return WriteJsonResponse(ctx, resp)
-	}
-
-	resp := views.DeleteUser(userId)
+	resp := views.DeleteUser(int(authId))
 	return WriteJsonResponse(ctx, resp)
 
 }
