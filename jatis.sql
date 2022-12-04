@@ -83,7 +83,7 @@ CREATE TABLE `reviews` (
   `order_id` int,
   `product_id` int,
   `rating` int,
-  `notes` tex,
+  `notes` text,
   `img_url` varchar(255),
   `created_at` timestamp
 );
