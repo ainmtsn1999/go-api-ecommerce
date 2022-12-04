@@ -93,3 +93,13 @@ func GetAllUser(ctx echo.Context) error {
 	resp := views.GetAllUser(limit, page)
 	return WriteJsonResponse(ctx, resp)
 }
+
+func DeleteUser(ctx echo.Context) error {
+	user := ctx.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	authId := claims["auth_id"].(float64)
+
+	resp := views.DeleteUser(int(authId))
+	return WriteJsonResponse(ctx, resp)
+
+}
