@@ -23,6 +23,7 @@ func Init() *echo.Echo {
 	user.GET("", controllers.GetAllUser, middlewares.IsAdmin)
 	user.POST("/profile", controllers.CreateUser, middlewares.IsUser)
 	user.PUT("/profile", controllers.UpdateUser, middlewares.IsUser)
+	user.DELETE("/profile", controllers.DeleteUser, middlewares.IsUser)
 	user.GET("/profile", controllers.GetUser, middlewares.IsUser)
 	user.POST("/profile/address", controllers.CreateAddress, middlewares.IsUser)
 	user.PUT("/address/id/:id", controllers.UpdateAddress, middlewares.IsUser)
@@ -35,6 +36,7 @@ func Init() *echo.Echo {
 	merchant.GET("", controllers.GetAllMerchant, middlewares.IsAdmin)
 	merchant.POST("/profile", controllers.CreateMerchant, middlewares.IsMerchant)
 	merchant.PUT("/profile", controllers.UpdateMerchant, middlewares.IsMerchant)
+	merchant.DELETE("/profile", controllers.DeleteMerchant, middlewares.IsMerchant)
 	merchant.GET("/profile", controllers.GetMerchant, middlewares.IsMerchant)
 
 	product := e.Group("/products")
