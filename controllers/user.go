@@ -93,3 +93,17 @@ func GetAllUser(ctx echo.Context) error {
 	resp := views.GetAllUser(limit, page)
 	return WriteJsonResponse(ctx, resp)
 }
+
+func DeleteUser(ctx echo.Context) error {
+	paramId := ctx.Param("id")
+
+	userId, err := strconv.Atoi(paramId)
+	if err != nil {
+		resp := views.ErrorResponse("INVALID_REQUEST", "BAD_REQUEST", http.StatusBadRequest)
+		return WriteJsonResponse(ctx, resp)
+	}
+
+	resp := views.DeleteUser(userId)
+	return WriteJsonResponse(ctx, resp)
+
+}
