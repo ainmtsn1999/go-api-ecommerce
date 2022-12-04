@@ -131,3 +131,16 @@ func UpdateUser(req *models.UserRequest, authId int) *Response {
 
 	return SuccessResponse("UPDATE_USER_SUCCESS", nil, http.StatusAccepted)
 }
+
+func DeleteUser(userId int) *Response {
+
+	err := models.DeleteUser(userId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ErrorResponse("DELETE_USER_FAILED", "NOT_FOUND", http.StatusNotModified)
+		}
+		return ErrorResponse("DELETE_USER_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+	}
+
+	return SuccessResponse("DELETE_USER_SUCCESS", nil, http.StatusOK)
+}

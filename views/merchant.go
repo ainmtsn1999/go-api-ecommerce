@@ -119,3 +119,16 @@ func UpdateMerchant(req *models.MerchantRequest, authId int) *Response {
 
 	return SuccessResponse("UPDATE_MERCHANT_SUCCESS", nil, http.StatusCreated)
 }
+
+func DeleteMerchant(merchantId int) *Response {
+
+	err := models.DeleteMerchant(merchantId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ErrorResponse("DELETE_MERCHANT_FAILED", "NOT_FOUND", http.StatusNotModified)
+		}
+		return ErrorResponse("DELETE_MERCHANT_FAILED", "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+	}
+
+	return SuccessResponse("DELETE_MERCHANT_SUCCESS", nil, http.StatusOK)
+}
